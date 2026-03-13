@@ -131,7 +131,7 @@ alpha = 0.1;
 % put all models together
 models = {model1; model2; model3; model4; model5; model6; model7; model8};
 
-%% Reversible reactions
+%% Run GEM-PROSPECT
 % File to store results
 out_rev = 'Results/screens/Max_flux_screen_8_Re.csv';
 out_irr = 'Results/screens/Max_flux_screen_8.csv';
