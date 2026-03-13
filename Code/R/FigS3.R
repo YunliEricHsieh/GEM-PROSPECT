@@ -5,6 +5,9 @@ library(dplyr)
 rxn_list <- read.table("Data/Reactions/list_of_rxns_with_at_least_one_protein_in_both.csv", header = TRUE, sep = ",")
 # remove the reactions associated with miltiple enzymes
 rxn_list <- rxn_list[!grepl(";", rxn_list$Enzymes), ]
+# remove the genes associated with mlitiple reactions
+enzyme_occurrences <- table(unlist(strsplit(rxn_list$Enzymes, ";")))
+rxn_list <- rxn_list[!sapply(rxn_list$Enzymes, function(e) any(enzyme_occurrences[names(enzyme_occurrences) %in% e] > 1)), ]
 
 # read & clean one table
 read_and_clean <- function(path) {
@@ -303,4 +306,4 @@ combined_plot <- gridExtra::grid.arrange(
   ncol = 3
 )
 # Save the combined plot
-ggsave("Results/figures/Sup Fig 4.svg", combined_plot, width = 12, height = 4)
+ggsave("Results/figures/Sup Fig 3.svg", combined_plot, width = 12, height = 4)

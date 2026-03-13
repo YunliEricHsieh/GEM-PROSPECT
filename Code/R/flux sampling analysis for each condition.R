@@ -1,4 +1,4 @@
-setwd('/Users/yunli/GEM-PERSPECT/')
+setwd('/Users/yunli/GEM-PROSPECT/')
 library(tidyverse)
 library(ggbeeswarm)
 library(FSA)

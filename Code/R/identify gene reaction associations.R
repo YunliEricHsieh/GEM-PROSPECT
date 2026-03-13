@@ -1,4 +1,4 @@
-setwd('/Users/yunli/GEM-PERSPECT/')
+setwd('/Users/yunli/GEM-PROSPECT/')
 
 # identify potential gene-reaction associations
 # reaction without GPR rules

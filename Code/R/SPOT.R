@@ -1,5 +1,5 @@
 # SPOT prediction score distribution
-setwd('/Users/yunli/GEM-PERSPECT/')
+setwd('/Users/yunli/GEM-PROSPECT/')
 
 library(dplyr)
 
