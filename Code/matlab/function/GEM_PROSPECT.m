@@ -106,7 +106,7 @@ function flux_values = GEM_PROSPECT(models, ratios, rxn_list, alpha)
     params.Threads = 2;
     params.OutputFlag = 0;
 
-    flux_values = NaN(numRxnsList, 1);
+    flux_values = num2cell(NaN(1, numRxnsList));
     row_offset = size(A_block, 1) + size(Aineq, 1);
     num_cols = size(problem_base.A, 2);
 
@@ -148,7 +148,7 @@ function flux_values = GEM_PROSPECT(models, ratios, rxn_list, alpha)
             flux_solution = gurobi(problem2, params);
             
             if strcmp(flux_solution.status, 'OPTIMAL')
-                flux_values(j) = flux_solution.objval;
+                flux_values{j} = flux_solution.objval;
             end
         end
     end
