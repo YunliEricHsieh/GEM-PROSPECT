@@ -2,34 +2,28 @@ changeCobraSolver('gurobi','all');
 changeCobraSolverParams('LP', 'feasTol', 1e-6);
 changeCobraSolverParams('QP', 'feasTol', 1e-6);
 
+ncpu = 20;
+if isempty(gcp('nocreate'))
+    parpool(ncpu);
+    parfevalOnAll(@maxNumCompThreads, 0, 1); 
+end
+
 %% load different type of models
-o_auto_model = readCbModel('Data/pciCre1355/NDLadpraw_Autotrophic_Rep1.xml');
-o_mixo_model = readCbModel('Data/pciCre1355/NDLadpraw_Mixotrophic_Rep1.xml');
-o_hetero_model = readCbModel('Data/pciCre1355/NDLadpraw_Heterotrophic_Rep1.xml');
+auto_model   = readCbModel('Data/pciCre1355/NDLadpraw_Autotrophic_Rep1.xml');
+mixo_model   = readCbModel('Data/pciCre1355/NDLadpraw_Mixotrophic_Rep1.xml');
+hetero_model = readCbModel('Data/pciCre1355/NDLadpraw_Heterotrophic_Rep1.xml');
 
-auto_model = o_auto_model;
-mixo_model = o_mixo_model;
-hetero_model = o_hetero_model;
-
-% find exchange and uptake reactions
 ex_rxns = auto_model.rxns(findExcRxns(auto_model));
 
-% target only uptake reactions
 upt_rxns = {};
-
 for i = 1:numel(ex_rxns)
-
-    col = find(ismember(auto_model.rxns,ex_rxns{i}));
-
-    % also remove the demand reactions from the list
-    if sum(auto_model.S(:,col)) == 1 & ~contains(ex_rxns{i}, 'DM') & contains(ex_rxns{i}, 'EX')
-
-        upt_rxns = [upt_rxns; ex_rxns(i)];
-
-    elseif sum(auto_model.S(:,col)) > 1
-
-        fprintf('Need to check the stoichiometric matrix for col: %d\n',col)
-        return
+    col = find(strcmp(auto_model.rxns, ex_rxns{i}));
+    
+    % Use nnz (number of non-zero elements) to mathematically check for exchanges
+    if nnz(auto_model.S(:,col)) == 1 && startsWith(ex_rxns{i}, 'EX_') && ~startsWith(ex_rxns{i}, 'DM_')
+        upt_rxns{end+1, 1} = ex_rxns{i};
+    elseif nnz(auto_model.S(:,col)) > 1
+        fprintf('Warning: Need to check the stoichiometric matrix for col: %d (%s)\n', col, ex_rxns{i});
     end
 end
 
@@ -39,19 +33,9 @@ hetero_upt_id = find(ismember(hetero_model.rxns, upt_rxns));
 mixo_upt_id = find(ismember(mixo_model.rxns, upt_rxns));
 
 % remove the upper bound constraint of uptake reactions
-for i = 1:numel(upt_rxns)
-    if auto_model.ub(auto_upt_id(i)) ~= 0
-        auto_model.ub(auto_upt_id(i)) = 1000;
-    end
-
-    if hetero_model.ub(hetero_upt_id(i)) ~= 0
-        hetero_model.ub(hetero_upt_id(i)) = 1000;
-    end
-
-    if mixo_model.ub(mixo_upt_id(i)) ~= 0
-        mixo_model.ub(mixo_upt_id(i)) = 1000;
-    end
-end
+auto_model.ub(auto_upt_id(auto_model.ub(auto_upt_id) ~= 0)) = 1000;
+hetero_model.ub(hetero_upt_id(hetero_model.ub(hetero_upt_id) ~= 0)) = 1000;
+mixo_model.ub(mixo_upt_id(mixo_model.ub(mixo_upt_id) ~= 0)) = 1000;
 
 % find the metabolic reactions
 filterRxns = @(model) model.rxns(~contains(model.rxns, {'EX_','draw','prot_pool'}));
@@ -63,10 +47,6 @@ hetero_rxns = filterRxns(hetero_model);
 rxn_list = intersect(intersect(auto_rxns, mixo_rxns), hetero_rxns);
 
 %% run FVA
-ncpu = 20;
-parpool(ncpu);
-parfevalOnAll(@maxNumCompThreads, 0, 1); 
-
 % FVA analysis
 [auto_minFlux, auto_maxFlux] = FVA_analysis (auto_model, 10, rxn_list);
 [mixo_minFlux, mixo_maxFlux]  = FVA_analysis (mixo_model, 10, rxn_list);
