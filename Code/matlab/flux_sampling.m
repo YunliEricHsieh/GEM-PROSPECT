@@ -42,6 +42,10 @@ auto_opt = optimizeCbModel(auto_model);
 hetero_opt = optimizeCbModel(hetero_model);
 mixo_opt = optimizeCbModel(mixo_model);
 
+auto_index = find(auto_model.c == 1);
+hetero_index = find(hetero_model.c == 1);
+mixo_index = find(mixo_model.c == 1);
+
 auto_model.lb(auto_index) = 0.9 * auto_opt.f;
 auto_model.ub(auto_index) = 0.9 * auto_opt.f;
 
