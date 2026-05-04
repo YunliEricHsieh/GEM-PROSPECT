@@ -38,7 +38,7 @@ apply_foldchange_filter <- function(df, sampling, threshold) {
 
 plot_recall_vs_count <- function(data, title, y_label_l, y_label_r, x_label){
   primary_range   <- c(0, 0.5)
-  secondary_range <- c(0, 5)
+  secondary_range <- c(0, 10)
   
   rescale_to_secondary <- function(x) scales::rescale(x, from = primary_range, to = secondary_range)
   
@@ -78,10 +78,6 @@ plot_recall_vs_count <- function(data, title, y_label_l, y_label_r, x_label){
 rxn_list <- read.table("Data/Reactions/list_of_rxns_with_at_least_one_protein_in_both.csv", header = TRUE, sep = ",")
 # Remove reactions associated with multiple enzymes (ones containing a semicolon)
 rxn_list <- rxn_list[!grepl(";", rxn_list$Enzymes), ]
-# remove the genes associated with mlitiple reactions
-enzyme_occurrences <- table(unlist(strsplit(rxn_list$Enzymes, ";")))
-rxn_list <- rxn_list[!sapply(rxn_list$Enzymes, function(e) any(enzyme_occurrences[names(enzyme_occurrences) %in% e] > 1)), ]
-
 
 max_re <- read_and_clean(paste0(topDir, "screens/Max_flux_screen_8_Re.csv"))
 max_ir <- read_and_clean(paste0(topDir, "screens/Max_flux_screen_8.csv"))
@@ -218,4 +214,4 @@ p_t <- plot_recall_vs_count(t_recall_rate, 'Gene-centric perspective',
 combined_plot <- p_f | p_s | p_t
 
 # Save the combined plot
-ggsave("Results/figures/Sup Fig 3.svg", combined_plot, width = 12, height = 4)
+ggsave("Results/figures/Sup Fig 2.svg", combined_plot, width = 12, height = 4)

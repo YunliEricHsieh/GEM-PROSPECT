@@ -4,7 +4,8 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(scales)
-library(patchwork)
+library(ggbeeswarm)
+library(gridExtra)
 
 topDir <- "Results/"
 
@@ -37,8 +38,8 @@ apply_foldchange_filter <- function(df, sampling, threshold) {
 }
 
 plot_recall_vs_count <- function(data, title, y_label_l, y_label_r, x_label){
-  primary_range   <- c(0, 0.5)
-  secondary_range <- c(0, 5)
+  primary_range   <- c(0, 0.6)
+  secondary_range <- c(0, 110)
   
   rescale_to_secondary <- function(x) scales::rescale(x, from = primary_range, to = secondary_range)
   
@@ -56,7 +57,7 @@ plot_recall_vs_count <- function(data, title, y_label_l, y_label_r, x_label){
     # Axes and Scales
     scale_y_continuous(
       name = y_label_l, limits = primary_range, breaks = seq(primary_range[1], primary_range[2], by = 0.1),
-      sec.axis = sec_axis(~ rescale_to_secondary(.), name = y_label_r, breaks = seq(secondary_range[1], secondary_range[2], by = 1))
+      sec.axis = sec_axis(~ rescale_to_secondary(.), name = y_label_r, breaks = seq(secondary_range[1], secondary_range[2], by = 10))
     ) +
     scale_fill_manual(name = "Type", values = type_colors) +
     scale_color_manual(name = "Type", values = type_colors) +
@@ -76,12 +77,6 @@ plot_recall_vs_count <- function(data, title, y_label_l, y_label_r, x_label){
 }
 
 rxn_list <- read.table("Data/Reactions/list_of_rxns_with_at_least_one_protein_in_both.csv", header = TRUE, sep = ",")
-# Remove reactions associated with multiple enzymes (ones containing a semicolon)
-rxn_list <- rxn_list[!grepl(";", rxn_list$Enzymes), ]
-# remove the genes associated with mlitiple reactions
-enzyme_occurrences <- table(unlist(strsplit(rxn_list$Enzymes, ";")))
-rxn_list <- rxn_list[!sapply(rxn_list$Enzymes, function(e) any(enzyme_occurrences[names(enzyme_occurrences) %in% e] > 1)), ]
-
 
 max_re <- read_and_clean(paste0(topDir, "screens/Max_flux_screen_8_Re.csv"))
 max_ir <- read_and_clean(paste0(topDir, "screens/Max_flux_screen_8.csv"))
@@ -207,15 +202,45 @@ t_recall_rate <- expand.grid(Type = types, Threshold = thresholds, stringsAsFact
     Threshold = paste0("-", Threshold)
   ) %>% ungroup() %>% select(-col_name)
 
+# Flux Sampling Processing 
+combine_sampling <- bind_rows(
+  Auto = bind_rows(sam_ir$Auto, sam_re$Auto),
+  Hetero = bind_rows(sam_ir$Hetero, sam_re$Hetero),
+  Mixo = bind_rows(sam_ir$Mixo, sam_re$Mixo),
+  .id = "Type"
+)
 
-p_f <- plot_recall_vs_count(f_recall_rate, 'Reaction-gene pair perspective', 
-                            "Recall Rate", "Number of reaction-gene pairs", "Threshold")
-p_s <- plot_recall_vs_count(s_recall_rate, 'Reaction-centric perspective', 
-                            "Recall Rate", "Number of reactions", "Threshold")
-p_t <- plot_recall_vs_count(t_recall_rate, 'Gene-centric perspective', 
-                            "Recall Rate", "Number of genes", "Threshold")
+rxn_mean_flux <- combine_sampling %>%
+  filter(RxnIndex %in% rxn_list$RxnIndex) %>%
+  group_by(Type, RxnIndex) %>%
+  summarise(mean_flux = log10(first(meanFlux)), .groups = "drop") %>%
+  rename(RxnID = RxnIndex)
 
-combined_plot <- p_f | p_s | p_t
+# Plot A: Violin Plot
+violin_plot <- ggplot(rxn_mean_flux, aes(x = Type, y = mean_flux, fill = Type)) +
+  geom_violin() +
+  geom_quasirandom(dodge.width = 0.9, varwidth = TRUE, size = 0.1) + 
+  scale_fill_brewer(palette = "Paired") +
+  labs(title = "a. Distribution of Mean Flux Values", y = "log10(Mean Flux)") +
+  theme_bw() +
+  theme(
+    panel.border = element_rect(fill = NA, colour = "black"),
+    axis.text = element_text(size = 12, color = "black"),
+    axis.title = element_text(size = 15, color = "black"),
+    plot.title = element_text(size = 13, face = "bold"),
+    axis.title.x = element_blank(),
+    legend.title = element_text(size = 15, color = "black"),
+    legend.text = element_text(size = 15, color = "black"),
+    legend.position = "right"
+  )
 
-# Save the combined plot
-ggsave("Results/figures/Sup Fig 3.svg", combined_plot, width = 12, height = 4)
+# Generate Recall Plots
+p_b <- plot_recall_vs_count(f_recall_rate, 'b. Reaction-gene pair perspective', "Recall Rate", "Number of reaction-gene pairs", "Threshold")
+p_c <- plot_recall_vs_count(s_recall_rate, 'c. Reaction-centric perspective', "Recall Rate", "Number of reactions", "Threshold")
+p_d <- plot_recall_vs_count(t_recall_rate, 'd. Gene-centric perspective', "Recall Rate", "Number of genes", "Threshold")
+
+# Combine the plots
+combined_plot <- gridExtra::grid.arrange(
+  violin_plot, p_b, p_c, p_d, ncol = 2)
+
+ggsave("Results/figures/Fig 3.svg", combined_plot, width = 12, height = 8)
