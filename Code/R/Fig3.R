@@ -40,8 +40,8 @@ apply_foldchange_filter <- function(df, sampling, threshold) {
 }
 
 plot_recall_vs_count <- function(data, title, y_label_l, y_label_r, x_label){
-  primary_range   <- c(0, 0.6)
-  secondary_range <- c(0, 110)
+  primary_range   <- c(0, 0.7)
+  secondary_range <- c(0, 120)
   
   rescale_to_secondary <- function(x) scales::rescale(x, from = primary_range, to = secondary_range)
   

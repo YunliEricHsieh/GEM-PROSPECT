@@ -40,7 +40,7 @@ apply_foldchange_filter <- function(df, sampling, threshold) {
 
 plot_recall_vs_count <- function(data, title, y_label_l, y_label_r, x_label, alpha_text) {
   primary_range   <- c(0, 0.8)
-  secondary_range <- c(0, 130)
+  secondary_range <- c(0, 140)
   rescale_to_secondary <- function(x) scales::rescale(x, from = primary_range, to = secondary_range)
   
   type_colors <- c(Auto = "#A6CEE3", Hetero = "#1F78B4", Mixo = "#B2DF8A")

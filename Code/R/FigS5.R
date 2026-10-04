@@ -245,7 +245,7 @@ a3 <- plot_recall_vs_count(t_recall_rate$omega001, 'Gene-centric perspective',  
 
 # Generate plots for omega 0.05
 b1 <- plot_recall_vs_count(f_recall_rate$omega005, '', "Recall Rate", "Number of reaction-gene pairs", "", "omega = 0.05")
-b2 <- plot_recall_vs_count(s_recall_rate$omega001, '', "Recall Rate", "Number of reactions",           "", "omega = 0.05")
+b2 <- plot_recall_vs_count(s_recall_rate$omega005, '', "Recall Rate", "Number of reactions",           "", "omega = 0.05")
 b3 <- plot_recall_vs_count(t_recall_rate$omega005, '', "Recall Rate", "Number of genes",               "", "omega = 0.05")
 
 # Generate plots for alpha 0.1
