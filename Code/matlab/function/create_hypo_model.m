@@ -1,4 +1,10 @@
 function [hypo10, hypo25, hypo75, original_model] = create_hypo_model(model, alpha)
+%CREATE_HYPO_MODEL Build three manuscript-specific C. reinhardtii nutrient models.
+%   model: Mixo COBRA struct with the listed positive nutrient uptake IDs.
+%   alpha sets biomass for the lower reference solution. Outputs set uptake
+%   upper bounds at 10/25/75% of the lower-to-upper solution-flux range and
+%   return the original with upper reference caps. Equal reference fluxes
+%   instead use lower flux times the fraction. No general media conversion.
 
 hypo10 = model;
 hypo25 = model;

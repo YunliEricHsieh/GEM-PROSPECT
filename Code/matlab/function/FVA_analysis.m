@@ -1,4 +1,10 @@
 function [minFlux, maxFlux] = FVA_analysis (model, percentage, rxn_list)
+%FVA_ANALYSIS Optimize reaction extrema at an exactly fixed biomass level.
+%   model: COBRA struct with S, b, bounds, rxns and one c==1 biomass.
+%   percentage: percent of optimal biomass (10 means 10%, not +/-10%).
+%   rxn_list: candidate IDs. Returns N-by-1 cell arrays, aligned to rxn_list.
+%   Both biomass bounds are fixed to percentage/100 of optimum. Missing
+%   solver objval is encoded as the text 'Inf', regardless of failure status.
 
 minFlux = cell(numel(rxn_list), 1);
 maxFlux = cell(numel(rxn_list), 1);
@@ -50,4 +56,3 @@ parfor i = 1:numel(rxn_list)
     end     
 
 end
-

@@ -1,3 +1,8 @@
+% E. coli labeled essentiality benchmark; run from repository root after setup.
+% Reads iML1515 MAT, essentiality labels and 16 condition FVA tables.
+% Writes joint tau-sweep maxima and individual-condition controls under screens/Ecoli.
+% Unlike ratio-based inference, this script does not minimize total flux first.
+% Essentiality labels inform growth constraints as well as downstream evaluation.
 changeCobraSolver('gurobi','all');
 changeCobraSolverParams('LP', 'feasTol', 1e-9);
 changeCobraSolverParams('QP', 'feasTol', 1e-9);

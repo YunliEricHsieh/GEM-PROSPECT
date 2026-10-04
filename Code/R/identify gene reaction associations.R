@@ -1,4 +1,5 @@
-setwd('/Users/yunli/GEM-PROSPECT/')
+# Run from the repository root; paths below are relative to this checkout.
+if (!dir.exists("Data") || !dir.exists("Code")) stop("Run from the GEM-PROSPECT repository root.")
 
 library(dplyr)
 library(tidyr)
@@ -13,9 +14,10 @@ read_and_clean <- function(path) {
   df[-1] <- lapply(df[-1], function(x) ifelse(is.infinite(x), NA, x))
   df[df < 0] <- 0
   # Drop rows where all numeric cols are NA
-  df[rowSums(!is.na(df[-1])) > 0, ]
+  df <- df[rowSums(!is.na(df[-1])) > 0, , drop = FALSE]
   # Drop cols where all numeric rows are NA
-  df[colSums(!is.na(df[-1])) > 0, ]
+  df <- df[, c(TRUE, colSums(!is.na(df[-1])) > 0), drop = FALSE]
+  return(df)
 }
 
 # log10 fold-change analysis
@@ -78,7 +80,7 @@ rxn_mutants_no_gpr <- rxn_list_no_gpr %>%
     Mixo_mutant   = map_int(RxnIndex, ~ sum(T1mixo[[.x]] == 0, na.rm = TRUE))
   )
 
-# Filter reactions (0 < mutants < 10) and find intersecting enzymes
+# Retain 1–19 candidates per reference and find intersecting enzymes.
 potential_association <- rxn_mutants_no_gpr %>%
   filter(
     between(Auto_mutant,   1, 19),
@@ -103,9 +105,9 @@ long_rxn <- rxn_list_w_gpr %>% separate_rows(Enzymes, sep = ";")
 
 blocked <- long_rxn %>% 
   mutate(
-    blk_auto   = map2_lgl(Enzymes, RxnIndex, ~{ idx <- match(.x, T1auto$EnzymeID); !is.na(idx) && T1auto[idx, .y] == 0 }),
-    blk_hetero = map2_lgl(Enzymes, RxnIndex, ~{ idx <- match(.x, T1hetero$EnzymeID); !is.na(idx) && T1hetero[idx, .y] == 0 }),
-    blk_mixo   = map2_lgl(Enzymes, RxnIndex, ~{ idx <- match(.x, T1mixo$EnzymeID); !is.na(idx) && T1mixo[idx, .y] == 0 })
+    blk_auto   = map2_lgl(Enzymes, RxnIndex, ~{ idx <- match(.x, T1auto$EnzymeID); .y %in% names(T1auto) && !is.na(idx) && T1auto[idx, .y] == 0 }),
+    blk_hetero = map2_lgl(Enzymes, RxnIndex, ~{ idx <- match(.x, T1hetero$EnzymeID); .y %in% names(T1hetero) && !is.na(idx) && T1hetero[idx, .y] == 0 }),
+    blk_mixo   = map2_lgl(Enzymes, RxnIndex, ~{ idx <- match(.x, T1mixo$EnzymeID); .y %in% names(T1mixo) && !is.na(idx) && T1mixo[idx, .y] == 0 })
   )
 
 rxn_stats <- blocked %>%

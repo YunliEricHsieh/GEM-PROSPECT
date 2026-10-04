@@ -1,4 +1,9 @@
 function [auto_model, mixo_model, hetero_model] = changeuptake(model1, model2, model3)
+%CHANGEUPTAKE Set C. reinhardtii nutrient caps from growth-constrained solutions.
+%   Inputs are Auto/Mixo/Hetero COBRA structs with positive split uptake IDs.
+%   Outputs copy these models with selected nutrient upper bounds replaced
+%   by uptake fluxes at exactly 99% of optimal biomass. IDs and 0.99 are
+%   case-study settings; these are solution fluxes, not uptake FVA extrema.
 
 auto_model = model1;
 mixo_model = model2;

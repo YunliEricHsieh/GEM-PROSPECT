@@ -1,0 +1,51 @@
+Code/matlab/.DS_Store
+/Code/matlab/old
+/Results/screens/old
+/Results/FVA/Ecoli/pcGEM
+/Results/flux_sampling/Ecoli
+/Code/python/old
+/Data/Ecoli/data
+/Data/Ecoli/code
+/Data/Ecoli/model
+
+# Local editing records, environments, and operating-system files
+/release-review/
+.DS_Store
+.Rhistory
+.RData
+__pycache__/
+*.py[cod]
+/.venv/
+
+# Author-only working files and external tool copies
+/Manuscript/
+/CataPro/
+/GECKO/
+/localization/
+/Code/R/old/
+/Code/matlab/GEM_PROSPECT_test_on_targeted_rxn.m
+/Code/matlab/condition_flux_sampling.m
+/Code/matlab/sensitivity_analysis_for_thresholds.m
+/Code/matlab/sensitivity_analysis_omega.m
+/Code/matlab/function/GEM_PROSPECT_w_omega.m
+/Code/matlab/function/GEM_PROSPECT_reversible_rxns_w_omega.m
+/Code/python/localization.py
+/Data/iCre1355_auto_upd.xml
+
+# Additional local analysis outputs
+/Results/flux_sampling/Cond*_sampling*.csv
+/Results/screens/*_alpha_*.csv
+/Results/screens/*_omega_*.csv
+/Results/max_flux/*_alpha_*.csv
+/Results/max_flux/*_omega_*.csv
+/Results/screens/targeted_gene*.csv
+/Results/screens/with_targeted_gene*.csv
+/Results/potential_reaction_associations_with_targeted_gene.*
+/Results/figures/
+/Results/examples/
+/Results/CataPro/
+/Results/SPOT/
+/Results/enzymes_and_substrates_for_reference_o.csv
+/Results/potential_gene_reaction_associations.csv
+/Results/potential_gene_reaction_associations_for_CataPro.csv
+/Fig 3.svg

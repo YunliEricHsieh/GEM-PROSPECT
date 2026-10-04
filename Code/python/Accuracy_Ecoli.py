@@ -1,3 +1,11 @@
+"""Evaluate the labeled E. coli benchmark's supplied/generated tau-sweep fluxes.
+
+Run from the repository root. Essentiality input is semicolon separated.
+Reports reaction accuracy with naive and collective-knockout GPR mappings;
+labels also informed modeling constraints, so this is not held-out validation.
+The script writes a PNG; it does not export a metrics CSV.
+"""
+
 import os
 import glob
 import pandas as pd
@@ -7,6 +15,7 @@ import matplotlib.pyplot as plt
 import re
 
 def load_data_and_mappinf(model_path, essentiality_path):
+    """Return reaction-label maps for any essential gene and GPR dependence."""
     print('Loading empirical gene essentiality data...')
     df_genes = pd.read_csv(essentiality_path,  sep=';')
     essential_genes = set(df_genes.loc[df_genes['Essentiality_0_1'] == 1, 'Gene_ID'].astype(str))
@@ -63,6 +72,11 @@ def parse_files(directory):
     return parsed_data
 
 def calculate_accuracy_metrics(file_path, target_column, assoc_dict, TOLERANCE):
+    """Return tau-wise accuracy; flux <= tolerance is positive, NaN becomes zero.
+
+    file_path is the parsed (filename, dataframe) list, despite its name.
+    Reactions absent from assoc_dict are excluded from the denominator.
+    """
     results = []
 
     for filename, df in file_path:
@@ -140,6 +154,11 @@ def plot_dual_accuracy_figure(custom_files, naive_assoc, gpr_assoc, output_filen
     plt.show()
 
 def run_full_analysis(model_path, essentiality_path, custom_dir, tolerance=1e-5):
+    """Load labeled inputs and plot accuracy from MaxFlux tables in custom_dir.
+
+    Uses the helper default tolerance unless overridden; the script's main
+    invocation explicitly passes 1e-7. Output filename is fixed below.
+    """
     naive_assoc, gpr_assoc = load_data_and_mappinf(model_path, essentiality_path)
 
     print('\nReading result files...')

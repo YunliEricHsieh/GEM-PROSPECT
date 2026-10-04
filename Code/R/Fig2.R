@@ -1,4 +1,5 @@
-setwd('/Users/yunli/GEM-PROSPECT/')
+# Run from the repository root; paths below are relative to this checkout.
+if (!dir.exists("Data") || !dir.exists("Code")) stop("Run from the GEM-PROSPECT repository root.")
 
 library(dplyr)
 library(tidyr)
@@ -14,9 +15,10 @@ read_and_clean <- function(path) {
   df[-1] <- lapply(df[-1], function(x) ifelse(is.infinite(x), NA, x))
   df[df < 0] <- 0
   # Drop rows where all numeric cols are NA
-  df[rowSums(!is.na(df[-1])) > 0, ]
+  df <- df[rowSums(!is.na(df[-1])) > 0, , drop = FALSE]
   # Drop cols where all numeric rows are NA
-  df[colSums(!is.na(df[-1])) > 0, ]
+  df <- df[, c(TRUE, colSums(!is.na(df[-1])) > 0), drop = FALSE]
+  return(df)
 }
 
 # log10 fold-change analysis

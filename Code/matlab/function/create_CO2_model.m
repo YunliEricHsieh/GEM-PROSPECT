@@ -1,4 +1,10 @@
 function [CO2model, original_model] = create_CO2_model(model, alpha)
+%CREATE_CO2_MODEL Build the manuscript's C. reinhardtii CO2-enriched variant.
+%   model: COBRA struct with EX_co2_e_REV positive uptake and one c==1 biomass.
+%   alpha: growth fraction for the lower reference solution. Outputs are a
+%   CO2 variant and an updated original model. The variant upper bound is
+%   max_co2 + 0.03*(max_co2-min_co2); the original cap is max_co2. Reference
+%   fluxes come from biomass-constrained solutions, not separate uptake FVA.
 
 CO2model = model;
 original_model = model;

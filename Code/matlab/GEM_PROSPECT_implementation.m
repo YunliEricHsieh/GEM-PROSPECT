@@ -1,3 +1,7 @@
+% C. reinhardtii case-study driver; run from the repository root after setup.
+% Reads three SBML models, processed log2 phenotypes, GO and FVA tables.
+% Builds eight condition models and overwrites Results/screens/Max_flux_screen_8*.csv.
+% See docs/input_formats.md for ratio orientation and docs/parameters.md for constants.
 changeCobraSolver('gurobi','all');
 changeCobraSolverParams('LP', 'feasTol', 1e-6);
 changeCobraSolverParams('QP', 'feasTol', 1e-6);

@@ -1,5 +1,6 @@
 # SPOT prediction score distribution
-setwd('/Users/yunli/GEM-PROSPECT/')
+# Run from the repository root; paths below are relative to this checkout.
+if (!dir.exists("Data") || !dir.exists("Code")) stop("Run from the GEM-PROSPECT repository root.")
 
 library(dplyr)
 library(ggplot2)

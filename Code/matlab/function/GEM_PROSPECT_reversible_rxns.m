@@ -1,4 +1,13 @@
 function flux_values = GEM_PROSPECT_reversible_rxns(models, ratios, rxn_list, alpha)
+%GEM_PROSPECT_REVERSIBLE_RXNS Evaluate split reversible candidate pairs.
+%   models/ratios/alpha follow GEM_PROSPECT's fixed eight-slot contract.
+%   rxn_list contains BACKWARD IDs with _REV; matching forward IDs are
+%   obtained by removing _REV and must exist in every active model.
+%   Returns a 1-by-N cell array of maximum absolute net flux, after minimizing
+%   the signed sum of all variables and linking both directions across models.
+%   A failed first stage leaves NaN; non-optimal second-stage directions use
+%   zero before taking the larger magnitude. Zero is not a solver-status flag.
+%   Assumes S*v=0 and one c==1 biomass; fixed slack is ratio*0.05.
 
     % find the testing models
     ratio_pairs = [1 2; 1 3; 2 3; 1 4; 2 5; 2 6; 2 7; 2 8];

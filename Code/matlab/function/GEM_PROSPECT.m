@@ -1,4 +1,14 @@
 function flux_values = GEM_PROSPECT(models, ratios, rxn_list, alpha)
+%GEM_PROSPECT Evaluate irreversible candidates with linked condition fluxes.
+%   models: eight ordered COBRA structs (Auto, Mixo, Hetero, Auto_CO2,
+%   Mixo_CO2, Hypo10, Hypo25, Hypo75 for the supplied case study).
+%   ratios: eight LINEAR biomass ratios in ratio_pairs order; NaN skips a
+%   pair. At least one pair must be active. alpha: minimum optimum fraction.
+%   rxn_list: cell array of candidate IDs present in every active model.
+%   Returns a 1-by-N cell array of target maxima after minimizing the signed
+%   sum of all flux variables. Non-optimal solves leave NaN. Assumes a single
+%   biomass c==1, S*v=0, and the supplied nonnegative split-flux representation.
+%   Ratio-relation slack is fixed at ratio*0.05; see docs/parameters.md.
     
     % find the testing models
     ratio_pairs = [1 2; 1 3; 2 3; 1 4; 2 5; 2 6; 2 7; 2 8];

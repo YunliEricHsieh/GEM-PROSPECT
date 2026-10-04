@@ -1,10 +1,18 @@
+"""C. reinhardtii library-profile QC; run from the repository root.
+
+Reads the supplied XLSX (first-row header; five metadata columns), groups
+profiles by Gene, and calculates iterative pairwise Spearman consistency.
+Writes retained profiles and a mean-correlation table; the R filter later
+requires strictly >0.5. This script does not reconstruct raw normalization.
+"""
+
 import numpy as np
 import pandas as pd
 
 # Specify the file path
 file_path = "Data/Mutant_phenotypes_table.xlsx"
 
-# Read the Excel file starting from the 7th row
+# Read the supplied Excel file using its first row as the header.
 df = pd.read_excel(file_path)
 
 # Filter the data from a specific column (remove 3'UTR and Confidence level > 4)
@@ -56,5 +64,3 @@ for gene, group in grouped:
 mean_correlations_df = pd.DataFrame(mean_correlations.items(), columns=['Gene', 'Mean Correlation'])
 mean_correlations_df.to_csv('Results/mean_correlation_of_phynotype/mean_correlations.csv', index=False)
 filtered_data.to_csv('Data/Mutant_phenotypes_table_filtered_by_num.csv', index=False)
-
-

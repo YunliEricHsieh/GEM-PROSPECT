@@ -1,4 +1,7 @@
 function writeToFile(fileName, rowData)
+%WRITETOFILE Append a cell row to an existing CSV output without quoting.
+%   fileName is a writable path; rowData contains identifiers and flux cells.
+%   Uses convertToString; identifiers must not contain commas or newlines.
     % Convert all elements to strings
     formattedRow = cellfun(@convertToString, rowData, 'UniformOutput', false);
 
